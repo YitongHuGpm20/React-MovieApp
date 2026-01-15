@@ -25,6 +25,7 @@ const App = () => {
   const [search, setSearch] = useState('');
   const [error, setError] = useState('');
   const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Fetch Movie Database
   const fetchMovies = async () => {
@@ -34,10 +35,19 @@ const App = () => {
       if(!response.ok) throw new Error('Failed to fetch movies from API');
       
       const data = await response.json();
-      if(data.Response === 'False') setError(data.Error || 'Failed to fetch movies from API');
+      if(data.Response === 'False') {
+        setError(data.Error || 'Failed to fetch movies from API');
+        setMovies([]);
+        return;
+      }
+      
+      // When fetch data successfully
+      setMovies(data.results || []);
     } catch (error) {
       console.log(`Error fetching movies: ${error}`);
       setError('Error fetching movies. Please try again later.');
+    } finally {
+      setIsLoading(false);
     }
   }
   
@@ -60,7 +70,18 @@ const App = () => {
         
         <section className="all-movies">
           <h2>All Movies</h2>
-          {error && <p className="text-red-500">{error}</p>}
+
+          {isLoading ? (
+            <p className="text-white">Loading...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : (
+            <ul>
+              {movies.map((movie) => (
+                <p className="text-white">{movie.title}</p>
+              ))}
+            </ul>
+          )}
         </section>
       </div>
     </main>
