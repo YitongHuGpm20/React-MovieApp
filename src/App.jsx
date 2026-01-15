@@ -8,6 +8,7 @@ import './App.css'
 
 // Components
 import Search from "./components/Search.jsx";
+import Spinner from "./components/Spinner.jsx";
 
 // API
 const API_BASE_URL = 'https://api.themoviedb.org/3';
@@ -72,7 +73,7 @@ const App = () => {
           <h2>All Movies</h2>
 
           {isLoading ? (
-            <p className="text-white">Loading...</p>
+            <Spinner />
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : (
