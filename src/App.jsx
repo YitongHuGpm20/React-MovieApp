@@ -1,5 +1,6 @@
 // Hooks
 import { useState, useEffect } from 'react'
+import { useDebounce } from 'react-use'
 
 // Assets
 import reactLogo from './assets/react.svg'
@@ -28,11 +29,17 @@ const App = () => {
   const [error, setError] = useState('');
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  
+  // Debounce Search Request
+  useDebounce(() => setDebouncedSearch(search), 500, [search]);
   
   // Fetch Movie Database
-  const fetchMovies = async () => {
+  const fetchMovies = async (query = '') => {
     try {
-      const endpoint = `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
+      const endpoint = query 
+        ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
+        : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
       const response = await fetch(endpoint, API_OPTIONS);
       if(!response.ok) throw new Error('Failed to fetch movies from API');
       
@@ -55,8 +62,8 @@ const App = () => {
   
   // On Start
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    fetchMovies(debouncedSearch);
+  }, [debouncedSearch]);
   
   return (
     <main>
